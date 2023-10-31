@@ -20,7 +20,7 @@ default_date_partition = f"{current_date.year}-{current_date.month}-{current_dat
 
 default_version_id = str(uuid.uuid4()) 
 
-default_bucket = "data-lake-demo-serving-dyping<your default bucket name>" 
+default_bucket = "s3://qairnd-mlops-serving" 
 
 default_prefix = "ml-customer-churn" 
 
@@ -66,7 +66,7 @@ if version_id == "":
 
  # catalog: database and table names 
 
-db_name = "customer_db" 
+db_name = "bank_customer_db" 
 
 tbl_customer = "customer_data" 
 
@@ -111,4 +111,3 @@ s_customer_churn = s_customer_churn.coalesce(1)
 s_customer_churn.write.option("header","true").format("csv").mode('Overwrite').save(output_dir) 
 
 logger.info("output_dir:" + output_dir) 
-
