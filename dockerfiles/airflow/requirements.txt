@@ -7,3 +7,4 @@ loguru
 cryptography==38.0.4
 apache-airflow-providers-amazon
 dvclive
+dvc-s3

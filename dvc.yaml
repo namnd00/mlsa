@@ -1,0 +1,21 @@
+stages:
+  run_pipeline:
+    cmd: python pipeline.py
+    deps:
+    - data/input_data
+    - data/output_data
+    - pipeline.py
+    metrics:
+    - data/artifacts/metrics.json:
+        cache: false
+    plots:
+    - data/artifacts/confusion_matrix.png
+metrics:
+- dvclive/metrics.json
+plots:
+- dvclive/plots/metrics:
+    x: step
+artifacts:
+  model:
+    path: data/artifacts/model.pkl
+    type: model

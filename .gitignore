@@ -167,3 +167,6 @@ aws/
 
 # model cache
 model_cache/
+
+# mlruns
+mlruns/

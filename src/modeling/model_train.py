@@ -7,7 +7,9 @@
 
 # Use all training data and train a model on them
 
+import json
 import os
+import pickle
 import mlflow
 import numpy as np
 import pandas as pd
@@ -96,6 +98,11 @@ def train_model(data_files, experiment_name, model_name, track_cv_performance=Tr
 
             # Train
             clf.fit(x_train, y_train)
+            output_model_path = os.path.join(cfg.ARTIFACTS_DIR, "model.pkl")
+            with open(output_model_path, "wb") as f:
+                pickle.dump(clf, f)
+
+            live.log_artifact(output_model_path, type="model")
 
             # MLflow: track model parameters
             params = clf.get_params()
@@ -127,6 +134,17 @@ def train_model(data_files, experiment_name, model_name, track_cv_performance=Tr
                 plt.savefig(file_path)
                 mlflow.log_artifact(file_path)
                 live.log_artifact(file_path)
+
+            with open(os.path.join(cfg.ARTIFACTS_DIR, "metrics.json"), "w") as outfile:
+                json.dump(
+                    {
+                        "cv_accuracy": cv_accuracy,
+                        "cv_f1": cv_f1,
+                        "val_accuracy": val_accuracy,
+                        "val_f1": val_f1,
+                    },
+                    outfile,
+                )
 
         # MLflow log the model
         mlflow.sklearn.log_model(clf, model_name)

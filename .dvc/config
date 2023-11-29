@@ -1,4 +1,5 @@
 [core]
     remote = mlops-bucket
+    autostage = true
 ['remote "mlops-bucket"']
     url = s3://mlops-bucket-20231130/dvcstore

@@ -10,6 +10,7 @@ import sys
 sys.path.append("/opt/airflow/")
 import os
 from datetime import timedelta
+
 from airflow import DAG
 from airflow.operators.python_operator import PythonOperator, BranchPythonOperator
 from airflow.operators.dummy import DummyOperator
@@ -28,33 +29,8 @@ from src.modeling.model_push import (
     check_if_registered_model_exists,
 )
 from src.modeling.model_validation import evaluate_model
-from src.config.core import DATA1
+from src.config.core import _data_files, experiment_name, model_name, reg_model
 
-
-model_name = "LR"
-experiment_name = "churn_prediction"
-reg_model = "LR/2"
-
-_root_dir = "/"
-_data_dir = "./data"
-_output_data_dir = _data_dir + "/output_data"
-if not os.path.exists(_output_data_dir):
-    os.makedirs(_output_data_dir, mode=0o777)
-_data_files = {
-    "input_raw_data_file": os.path.join(DATA1),
-    "raw_data_file": os.path.join(_output_data_dir + "/data.csv"),
-    "raw_x_train_file": os.path.join(_output_data_dir + "/x_train_raw.csv"),
-    "raw_x_test_file": os.path.join(_output_data_dir + "/x_test_raw.csv"),
-    "raw_y_train_file": os.path.join(_output_data_dir + "/y_train_raw.csv"),
-    "raw_y_test_file": os.path.join(_output_data_dir + "/y_test_raw.csv"),
-    "transformed_x_train_file": os.path.join(_output_data_dir + "/x_train.csv"),
-    "transformed_y_train_file": os.path.join(_output_data_dir + "/y_train.csv"),
-    "transformed_x_test_file": os.path.join(_output_data_dir + "/x_test.csv"),
-    "transformed_y_test_file": os.path.join(_output_data_dir + "/y_test.csv"),
-}
-
-if not _root_dir:
-    raise ValueError("PROJECT_PATH environment variable not set")
 
 default_args = {
     "owner": "namnd00",
