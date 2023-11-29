@@ -1,3 +1,10 @@
+#!/usr/bin/env python
+# -*-coding:utf-8 -*-
+"""
+@File    :   core.py
+@Time    :   2023/11/29 19:16:18
+"""
+
 from pathlib import Path
 import os
 import sys
