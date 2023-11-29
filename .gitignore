@@ -163,4 +163,7 @@ cython_debug/
 airflow/logs/**
 
 # aws
-aws
+aws/
+
+# model cache
+model_cache/
