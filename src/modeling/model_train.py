@@ -7,12 +7,15 @@
 
 # Use all training data and train a model on them
 
+import os
 import mlflow
+import numpy as np
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
 from xgboost import XGBClassifier
 from loguru import logger
-
+from sklearn.metrics import ConfusionMatrixDisplay, confusion_matrix
+import matplotlib.pyplot as plt
 from src.processing.data_transformation import check_keys
 from src.modeling.model_validation import (
     get_cv_performance,
@@ -20,6 +23,7 @@ from src.modeling.model_validation import (
     get_predictions,
     evaluate_model,
 )
+from src.config import core as cfg
 
 
 def get_model(model_name="LR"):
@@ -106,6 +110,15 @@ def train_model(data_files, experiment_name, model_name, track_cv_performance=Tr
             val_accuracy, val_f1 = get_val_performance(y_test, y_pred)
             metrics = {"val_accuracy": val_accuracy, "val_f1": val_f1}
             mlflow.log_metrics(metrics)
+            # Plot confusion matrix
+            cm = confusion_matrix(y_test, y_pred, labels=clf.classes_)
+            cm = ConfusionMatrixDisplay(
+                confusion_matrix=cm, display_labels=clf.classes_
+            )
+            cm.plot()
+            file_path = os.path.join(cfg.ARTIFACTS_DIR, "confusion_matrix.png")
+            plt.savefig(file_path)
+            mlflow.log_artifact(file_path)
 
         # MLflow log the model
         mlflow.sklearn.log_model(clf, model_name)

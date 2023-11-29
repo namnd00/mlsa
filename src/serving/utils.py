@@ -51,7 +51,7 @@ class ModelLoader:
         logger.info("Loading model from: %s", model_uri)
 
         # Create a cache object
-        cache = Memory(self.cache_dir).cache
+        # cache = Memory(self.cache_dir).cache
 
         # Check if a new model version is available
         latest_model_version = mlflow.MlflowClient().get_latest_versions(
@@ -61,15 +61,15 @@ class ModelLoader:
 
         # Add the model version to the cache metadata
         if model_loader == "sklearn":
-            load_model_func = cache(
-                mlflow.sklearn.load_model
-            )  # Apply caching to the load_model function
-            self.model = load_model_func(model_uri)
+            # load_model_func = cache(
+            #     mlflow.sklearn.load_model
+            # )  # Apply caching to the load_model function
+            self.model = mlflow.sklearn.load_model(model_uri)
         elif model_loader == "pyfunc":
-            load_model_func = cache(
-                mlflow.pyfunc.load_model
-            )  # Apply caching to the load_model function
-            self.model = load_model_func(model_uri)
+            # load_model_func = cache(
+            #     mlflow.pyfunc.load_model
+            # )  # Apply caching to the load_model function
+            self.model = mlflow.pyfunc.load_model(model_uri)
         else:
             self.model = None
             raise Exception(f"Not implemented model loading: %s" % model_uri)

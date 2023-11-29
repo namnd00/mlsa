@@ -27,6 +27,8 @@ logging.basicConfig(
     format="API - %(asctime)s - %(levelname)s - %(module)s - %(message)s",
 )
 
+logger = logging.getLogger(__name__)
+
 app = FastAPI(
     title="FastAPIModelServing",
     version=cfg.MODEL_SERVING_API_VERSION,
@@ -56,6 +58,7 @@ def predict(
             "id": received_data.id,
             "predictions": predictions.tolist(),
         }
+        logger.info(content)
         return JSONResponse(content=content)
     except Exception as e:
         response.status_code = 500

@@ -16,6 +16,10 @@ import src
 SRC_ROOT = Path(src.__file__).resolve().parent
 ROOT = SRC_ROOT.parent
 DATASET_DIR = ROOT / "data"
+ARTIFACTS_DIR = DATASET_DIR / "artifacts"
+
+if not os.path.exists(ARTIFACTS_DIR):
+    os.makedirs(ARTIFACTS_DIR)
 
 DATA1 = DATASET_DIR / "input_data/telco_customer_churn_1.csv"
 DATA2 = DATASET_DIR / "input_data/telco_customer_churn_2.csv"
