@@ -114,21 +114,22 @@ def replace_empty_in_col(data: pd.DataFrame) -> pd.DataFrame:
     return data
 
 
-def fit_categorical_encoders(x_train: pd.DataFrame, y_train: pd.Series) -> dict:
+def fit_categorical_encoders(x_train: pd.DataFrame) -> dict:
     """
     Fit categorical encoders on train data
     """
     ordinal_encoder_arbitrary = OrdinalEncoder(
-        encoding_method="arbitrary", variables=CAT_VARS_ORDINAL_ARBITARY
+        encoding_method="arbitrary",
+        variables=CAT_VARS_ORDINAL_ARBITARY,
     )
-    ordinal_encoder_arbitrary.fit(x_train, y_train)
+    ordinal_encoder_arbitrary.fit(x_train)
 
-    onehot_encoder = OneHotEncoder(variables=CAT_VARS_ONEHOT)
-    onehot_encoder.fit(x_train)
+    # onehot_encoder = OneHotEncoder(variables=CAT_VARS_ONEHOT)
+    # onehot_encoder.fit(x_train)
 
     cat_encoders = {
         "ordinal_encoder": ordinal_encoder_arbitrary,
-        "onehot_encoder": onehot_encoder,
+        # "onehot_encoder": onehot_encoder,
     }
 
     return cat_encoders
@@ -221,10 +222,14 @@ def oversample_data(x_train: pd.DataFrame, y_train: pd.Series):
 
 
 def get_preprocess_data(x_train, x_test, y_train, y_test):
+    selected_cols = NUM_VARS_YEO_YOHNSON + CAT_VARS_ORDINAL_ARBITARY
+    x_train = x_train[selected_cols]
+    x_test = x_test[selected_cols]
+
     x_train = replace_empty_in_col(x_train)
     x_test = replace_empty_in_col(x_test)
 
-    cat_encoders = fit_categorical_encoders(x_train, y_train)
+    cat_encoders = fit_categorical_encoders(x_train)
     x_train = transform_categorical_encoders(x_train, cat_encoders)
     x_test = transform_categorical_encoders(x_test, cat_encoders)
 

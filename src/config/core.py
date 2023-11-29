@@ -39,3 +39,11 @@ CAT_VARS_ORDINAL_ARBITARY = [
 NUM_VARS_YEO_YOHNSON = ["TotalCharges"]
 TARGET = "Churn"
 VAR_REPLACE_EMPTY_DATA = ["TotalCharges"]
+
+### Serving
+MODEL_SERVING_NAME = "LR"
+MODEL_SERVING_STAGE = "production"
+MODEL_SERVING_LOADER = "sklearn"
+MODEL_SERVING_API_VERSION = "v0.1.0"
+MLFLOW_TRACKING_URI = "http://127.0.0.1:5001"
+# MLFLOW_TRACKING_URI = "http://host.docker.internal:5001"
