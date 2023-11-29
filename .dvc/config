@@ -1,0 +1,4 @@
+[core]
+    remote = mlops-bucket
+['remote "mlops-bucket"']
+    url = s3://mlops-bucket-20231130/dvcstore
