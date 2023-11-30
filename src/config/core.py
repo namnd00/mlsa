@@ -61,7 +61,7 @@ MLFLOW_TRACKING_URI = "http://127.0.0.1:5001"
 
 # DAGS configuration
 
-model_name = "LR"
+model_name = "XGB"  # "LR"  # XGB
 experiment_name = "churn_prediction"
 reg_model = "LR/2"
 

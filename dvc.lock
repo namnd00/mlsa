@@ -15,9 +15,9 @@ stages:
     outs:
     - path: artifacts/confusion_matrix.png
       hash: md5
-      md5: 25b4f4c97db3fba4b60f750042640238
-      size: 15960
+      md5: 9d13fde6bf0eed68f5c3198fa28101a3
+      size: 15983
     - path: artifacts/metrics.json
       hash: md5
-      md5: 79fb92fb05f5cd42932c999893d55c5f
+      md5: 8a646fc57e0dfd13f76864b00931fd08
       size: 130
