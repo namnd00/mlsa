@@ -90,60 +90,133 @@ def train_model(data_files, experiment_name, model_name, track_cv_performance=Tr
     # MLflow: experiment name
     mlflow.set_experiment(experiment_name)
 
-    with Live() as live:
-        with mlflow.start_run() as run:
-            # MLflow: print run specific info
-            run_id = run.info.run_id
-            logger.info(f"\nActive run_id: {run_id}")
+    with mlflow.start_run() as run:
+        # MLflow: print run specific info
+        run_id = run.info.run_id
+        logger.info(f"\nActive run_id: {run_id}")
 
-            # Train
-            clf.fit(x_train, y_train)
-            output_model_path = os.path.join(cfg.ARTIFACTS_DIR, "model.pkl")
-            with open(output_model_path, "wb") as f:
-                pickle.dump(clf, f)
+        # Train
+        clf.fit(x_train, y_train)
+        output_model_path = os.path.join(cfg.ARTIFACTS_DIR, "model.pkl")
+        with open(output_model_path, "wb") as f:
+            pickle.dump(clf, f)
 
-            live.log_artifact(output_model_path, type="model")
+        # MLflow: track model parameters
+        mlflow.log_params(clf.get_params())
 
-            # MLflow: track model parameters
-            mlflow.log_params(clf.get_params())
+        # MLflow: track CV performance
+        if track_cv_performance is True:
+            cv_accuracy, cv_f1 = get_cv_performance(x_train, y_train, clf)
+            metrics = {"cv_accuracy": cv_accuracy, "cv_f1": cv_f1}
+            mlflow.log_metrics(metrics)
 
-            # MLflow: track CV performance
-            if track_cv_performance is True:
-                cv_accuracy, cv_f1 = get_cv_performance(x_train, y_train, clf)
-                metrics = {"cv_accuracy": cv_accuracy, "cv_f1": cv_f1}
-                mlflow.log_metrics(metrics)
+        # MLflow: track performance on validation
+        if x_test is not None and y_test is not None:
+            y_pred = get_predictions(x_test, clf)
+            val_accuracy, val_f1 = get_val_performance(y_test, y_pred)
+            metrics = {"val_accuracy": val_accuracy, "val_f1": val_f1}
+            mlflow.log_metrics(metrics)
+            # Plot confusion matrix
+            cm = confusion_matrix(y_test, y_pred, labels=clf.classes_)
+            cm = ConfusionMatrixDisplay(
+                confusion_matrix=cm, display_labels=clf.classes_
+            )
+            cm.plot()
+            file_path = os.path.join(cfg.ARTIFACTS_DIR, "confusion_matrix.png")
+            plt.savefig(file_path)
+            mlflow.log_artifact(file_path)
 
-            # MLflow: track performance on validation
-            if x_test is not None and y_test is not None:
-                y_pred = get_predictions(x_test, clf)
-                val_accuracy, val_f1 = get_val_performance(y_test, y_pred)
-                metrics = {"val_accuracy": val_accuracy, "val_f1": val_f1}
-                mlflow.log_metrics(metrics)
-                # Plot confusion matrix
-                cm = confusion_matrix(y_test, y_pred, labels=clf.classes_)
-                cm = ConfusionMatrixDisplay(
-                    confusion_matrix=cm, display_labels=clf.classes_
+            with open(os.path.join(cfg.ARTIFACTS_DIR, "metrics.json"), "w") as outfile:
+                json.dump(
+                    {
+                        "cv_accuracy": cv_accuracy,
+                        "cv_f1": cv_f1,
+                        "val_accuracy": val_accuracy,
+                        "val_f1": val_f1,
+                    },
+                    outfile,
                 )
-                cm.plot()
-                file_path = os.path.join(cfg.ARTIFACTS_DIR, "confusion_matrix.png")
-                plt.savefig(file_path)
-                mlflow.log_artifact(file_path)
 
-                with open(
-                    os.path.join(cfg.ARTIFACTS_DIR, "metrics.json"), "w"
-                ) as outfile:
-                    json.dump(
-                        {
-                            "cv_accuracy": cv_accuracy,
-                            "cv_f1": cv_f1,
-                            "val_accuracy": val_accuracy,
-                            "val_f1": val_f1,
-                        },
-                        outfile,
-                    )
-
-            # MLflow log the model
-            mlflow.sklearn.log_model(clf, model_name)
-            model_uri = mlflow.get_artifact_uri(model_name)
+        # MLflow log the model
+        mlflow.sklearn.log_model(clf, model_name)
+        model_uri = mlflow.get_artifact_uri(model_name)
 
     return run_id, model_uri
+
+
+def train_model_ci(data_files, experiment_name, model_name, track_cv_performance=True):
+    """
+    Train a model and track it with MLflow. Return model_uri so
+    the model can be available for next steps in the pipeline.
+    Enabling 'track_cv_performance' will perform cross validation.
+
+    data_files (dict): A dictionary of data file paths.
+    The keys that this function will use are:
+        'transformed_x_train_file': the transformed x_train
+        'transformed_x_test_file': the transformed x_test
+        'transformed_y_train_file': the transformed y_train
+        'transformed_y_test_file': the transformed y_test
+    experiment_name (str): the experiment name for mlflow
+    model_name (str): the model name for mlflow and also get_model function
+    """
+    required_keys = [
+        "transformed_x_train_file",
+        "transformed_x_test_file",
+        "transformed_y_train_file",
+        "transformed_y_test_file",
+    ]
+    check_keys(data_files, required_keys)
+
+    x_train = pd.read_csv(data_files["transformed_x_train_file"])
+    x_test = pd.read_csv(data_files["transformed_x_test_file"])
+    y_train = pd.read_csv(data_files["transformed_y_train_file"]).values  # get np array
+    y_test = pd.read_csv(data_files["transformed_y_test_file"]).values  # get np array
+
+    # Get the untrained model
+    clf = get_model(model_name)
+
+    # MLflow: tell MLflow where the model tracking server is
+    # mlflow.set_tracking_uri('http://127.0.0.1:5000')
+
+    # MLflow: experiment name
+    mlflow.set_experiment(experiment_name)
+
+    with Live() as live:
+        # Train
+        clf.fit(x_train, y_train)
+        output_model_path = os.path.join(cfg.ARTIFACTS_DIR, "model.pkl")
+        with open(output_model_path, "wb") as f:
+            pickle.dump(clf, f)
+
+        live.log_artifact(output_model_path, type="model")
+
+        if track_cv_performance is True:
+            cv_accuracy, cv_f1 = get_cv_performance(x_train, y_train, clf)
+            metrics = {"cv_accuracy": cv_accuracy, "cv_f1": cv_f1}
+            for key, value in metrics.items():
+                live.log_metric(key, value)
+
+        # MLflow: track performance on validation
+        if x_test is not None and y_test is not None:
+            y_pred = get_predictions(x_test, clf)
+            val_accuracy, val_f1 = get_val_performance(y_test, y_pred)
+            metrics = {"val_accuracy": val_accuracy, "val_f1": val_f1}
+            # Plot confusion matrix
+            cm = confusion_matrix(y_test, y_pred, labels=clf.classes_)
+            cm = ConfusionMatrixDisplay(
+                confusion_matrix=cm, display_labels=clf.classes_
+            )
+            cm.plot()
+            file_path = os.path.join(cfg.ARTIFACTS_DIR, "confusion_matrix.png")
+            plt.savefig(file_path)
+
+            with open(os.path.join(cfg.ARTIFACTS_DIR, "metrics.json"), "w") as outfile:
+                json.dump(
+                    {
+                        "cv_accuracy": cv_accuracy,
+                        "cv_f1": cv_f1,
+                        "val_accuracy": val_accuracy,
+                        "val_f1": val_f1,
+                    },
+                    outfile,
+                )

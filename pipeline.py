@@ -21,7 +21,7 @@ data_transformation.split_train_test(_data_files)
 data_transformation.preprocess_data(_data_files)
 
 # train model
-model_train.train_model(
+model_train.train_model_ci(
     data_files=_data_files,
     experiment_name=experiment_name,
     model_name=model_name,

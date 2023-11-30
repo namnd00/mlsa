@@ -1,0 +1,23 @@
+schema: '2.0'
+stages:
+  run_pipeline:
+    cmd: python pipeline.py
+    deps:
+    - path: data
+      hash: md5
+      md5: 072cb92ce2008fbd017d64241ed300ff.dir
+      size: 3174076
+      nfiles: 13
+    - path: pipeline.py
+      hash: md5
+      md5: e22507ca29d598088448fadba35a4df5
+      size: 699
+    outs:
+    - path: artifacts/confusion_matrix.png
+      hash: md5
+      md5: 25b4f4c97db3fba4b60f750042640238
+      size: 15960
+    - path: artifacts/metrics.json
+      hash: md5
+      md5: 79fb92fb05f5cd42932c999893d55c5f
+      size: 130

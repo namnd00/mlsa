@@ -16,5 +16,5 @@ plots:
     x: step
 artifacts:
   model:
-    path: data/artifacts/model.pkl
+    path: artifacts/model.pkl
     type: model
