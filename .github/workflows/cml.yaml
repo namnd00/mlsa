@@ -22,7 +22,6 @@ jobs:
           dvc repro --force                # Reproduce pipeline
 
           git fetch --prune --unshallow
-          dvc metrics diff --show-md master >> report.md
           vl2png ./artifacts/metrics.json -s 1.3 > metrics.png
           echo '![](./metrics.png)' >> report.md
           echo '![](./artifacts/confusion_matrix.png)' >> report.md
