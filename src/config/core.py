@@ -16,7 +16,7 @@ import src
 SRC_ROOT = Path(src.__file__).resolve().parent
 ROOT = SRC_ROOT.parent
 DATASET_DIR = ROOT / "data"
-ARTIFACTS_DIR = DATASET_DIR / "artifacts"
+ARTIFACTS_DIR = ROOT / "artifacts"
 
 if not os.path.exists(ARTIFACTS_DIR):
     os.makedirs(ARTIFACTS_DIR)

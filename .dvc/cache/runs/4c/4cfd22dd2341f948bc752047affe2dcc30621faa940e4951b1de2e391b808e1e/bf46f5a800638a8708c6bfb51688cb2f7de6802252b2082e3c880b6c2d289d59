@@ -1,0 +1,25 @@
+cmd: python pipeline.py
+deps:
+- path: data/input_data
+  hash: md5
+  md5: c49e2f3b69f33903e85e542cdb8d61b1.dir
+  size: 991356
+  nfiles: 4
+- path: data/output_data
+  hash: md5
+  md5: cf0baa61f16886808dd5060635c199a6.dir
+  size: 2182720
+  nfiles: 9
+- path: pipeline.py
+  hash: md5
+  md5: 36122d149c2858065f845b2be084278a
+  size: 696
+outs:
+- path: data/artifacts/confusion_matrix.png
+  hash: md5
+  md5: 25b4f4c97db3fba4b60f750042640238
+  size: 15960
+- path: data/artifacts/metrics.json
+  hash: md5
+  md5: 79fb92fb05f5cd42932c999893d55c5f
+  size: 130

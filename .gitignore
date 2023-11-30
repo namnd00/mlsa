@@ -170,3 +170,4 @@ model_cache/
 
 # mlruns
 mlruns/
+/data

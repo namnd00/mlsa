@@ -16,17 +16,7 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
-          bash gen_env.sh  # Install dependencies
+          pip install --upgrade pip
+          pip install -r requirements.txt  # Install dependencies
           dvc pull data --run-cache        # Pull data & run-cache from S3
           dvc repro                        # Reproduce pipeline
-      - name: Create CML report
-        env:
-          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          # Use DVC metrics diff to compare metrics to master
-          git fetch --prune --unshallow
-          dvc metrics diff --show-md master >> report.md
-
-          # Add figure to report
-          echo '![](./vega.png)' >> report.md
-          cml comment create --pr --publish report.md

@@ -19,7 +19,6 @@ from loguru import logger
 from sklearn.metrics import ConfusionMatrixDisplay, confusion_matrix
 import matplotlib.pyplot as plt
 from src.processing.data_transformation import check_keys
-from dvclive import Live
 from src.modeling.model_validation import (
     get_cv_performance,
     get_val_performance,
@@ -27,6 +26,7 @@ from src.modeling.model_validation import (
     evaluate_model,
 )
 from src.config import core as cfg
+from dvclive import Live
 
 
 def get_model(model_name="LR"):
@@ -90,8 +90,8 @@ def train_model(data_files, experiment_name, model_name, track_cv_performance=Tr
     # MLflow: experiment name
     mlflow.set_experiment(experiment_name)
 
-    with mlflow.start_run() as run:
-        with Live(save_dvc_exp=True) as live:
+    with Live() as live:
+        with mlflow.start_run() as run:
             # MLflow: print run specific info
             run_id = run.info.run_id
             logger.info(f"\nActive run_id: {run_id}")
@@ -105,16 +105,13 @@ def train_model(data_files, experiment_name, model_name, track_cv_performance=Tr
             live.log_artifact(output_model_path, type="model")
 
             # MLflow: track model parameters
-            params = clf.get_params()
-            mlflow.log_params(params)
+            mlflow.log_params(clf.get_params())
 
             # MLflow: track CV performance
             if track_cv_performance is True:
                 cv_accuracy, cv_f1 = get_cv_performance(x_train, y_train, clf)
                 metrics = {"cv_accuracy": cv_accuracy, "cv_f1": cv_f1}
                 mlflow.log_metrics(metrics)
-                live.log_metric("cv_accuracy", metrics["cv_accuracy"])
-                live.log_metric("cv_f1", metrics["cv_f1"])
 
             # MLflow: track performance on validation
             if x_test is not None and y_test is not None:
@@ -122,8 +119,6 @@ def train_model(data_files, experiment_name, model_name, track_cv_performance=Tr
                 val_accuracy, val_f1 = get_val_performance(y_test, y_pred)
                 metrics = {"val_accuracy": val_accuracy, "val_f1": val_f1}
                 mlflow.log_metrics(metrics)
-                live.log_metric("val_accuracy", metrics["val_accuracy"])
-                live.log_metric("val_f1", metrics["val_f1"])
                 # Plot confusion matrix
                 cm = confusion_matrix(y_test, y_pred, labels=clf.classes_)
                 cm = ConfusionMatrixDisplay(
@@ -133,21 +128,22 @@ def train_model(data_files, experiment_name, model_name, track_cv_performance=Tr
                 file_path = os.path.join(cfg.ARTIFACTS_DIR, "confusion_matrix.png")
                 plt.savefig(file_path)
                 mlflow.log_artifact(file_path)
-                live.log_artifact(file_path)
 
-            with open(os.path.join(cfg.ARTIFACTS_DIR, "metrics.json"), "w") as outfile:
-                json.dump(
-                    {
-                        "cv_accuracy": cv_accuracy,
-                        "cv_f1": cv_f1,
-                        "val_accuracy": val_accuracy,
-                        "val_f1": val_f1,
-                    },
-                    outfile,
-                )
+                with open(
+                    os.path.join(cfg.ARTIFACTS_DIR, "metrics.json"), "w"
+                ) as outfile:
+                    json.dump(
+                        {
+                            "cv_accuracy": cv_accuracy,
+                            "cv_f1": cv_f1,
+                            "val_accuracy": val_accuracy,
+                            "val_f1": val_f1,
+                        },
+                        outfile,
+                    )
 
-        # MLflow log the model
-        mlflow.sklearn.log_model(clf, model_name)
-        model_uri = mlflow.get_artifact_uri(model_name)
+            # MLflow log the model
+            mlflow.sklearn.log_model(clf, model_name)
+            model_uri = mlflow.get_artifact_uri(model_name)
 
     return run_id, model_uri
