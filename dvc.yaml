@@ -7,8 +7,6 @@ stages:
     metrics:
     - artifacts/metrics.json:
         cache: false
-    plots:
-    - artifacts/confusion_matrix.png
 metrics:
 - dvclive/metrics.json
 plots:
