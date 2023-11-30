@@ -18,5 +18,5 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install -r requirements.txt  # Install dependencies
-          dvc pull data --run-cache        # Pull data & run-cache from S3
+          dvc pull                         # Pull data & run-cache from S3
           dvc repro                        # Reproduce pipeline
