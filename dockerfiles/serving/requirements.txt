@@ -1,0 +1,10 @@
+uvicorn
+fastapi
+gunicorn
+mlflow
+feature-engine
+xgboost
+imblearn
+loguru
+boto3
+cryptography==38.0.4

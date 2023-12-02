@@ -5,9 +5,9 @@ stages:
     deps:
     - path: data
       hash: md5
-      md5: 072cb92ce2008fbd017d64241ed300ff.dir
-      size: 3174076
-      nfiles: 13
+      md5: 7d251e5040da8d1663e1a33d5d7f75f4.dir
+      size: 4151454
+      nfiles: 15
     - path: pipeline.py
       hash: md5
       md5: e22507ca29d598088448fadba35a4df5

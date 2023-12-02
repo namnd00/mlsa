@@ -1,0 +1,20 @@
+version: '3.7'
+
+services:
+  model-serving:
+    image: ${IMAGE_NAME}:${IMAGE_TAG}
+    environment:
+      WORKERS: ${WORKERS}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      MLFLOW_TRACKING_URI: "http://host.docker.internal:5001"
+    entrypoint: /bin/sh -c "gunicorn src.serving.api:app --workers ${WORKERS} --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000"
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "0.0.0.0:8000"]
+      interval: 5s
+      retries: 5
+    ports:
+      - 8000:8000
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

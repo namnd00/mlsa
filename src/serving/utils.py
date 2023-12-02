@@ -32,7 +32,8 @@ class ModelLoader:
     def __init__(self) -> None:
         self.model_path: Text = None
         self.model: Optional[Callable] = None
-        mlflow.set_tracking_uri(cfg.MLFLOW_TRACKING_URI)
+        mlflow_tracking_uri = os.environ.get("MLFLOW_TRACKING_URI")
+        mlflow.set_tracking_uri(mlflow_tracking_uri)
         self.cache_dir = "model_cache"
 
     def get_model(self) -> Callable:
