@@ -55,10 +55,10 @@ class ModelLoader:
         # cache = Memory(self.cache_dir).cache
 
         # Check if a new model version is available
-        # latest_model_version = mlflow.MlflowClient().get_latest_versions(
-        #    cfg.MODEL_SERVING_NAME, stages=[mlflow_model_prefix]
-        # )[0]
-        # logger.info(f"Model version: {latest_model_version}")
+        latest_model_version = mlflow.MlflowClient().get_latest_versions(
+            cfg.MODEL_SERVING_NAME, stages=[mlflow_model_prefix]
+        )[0]
+        logger.info(f"Model version: {latest_model_version}")
 
         # Add the model version to the cache metadata
         if model_loader == "sklearn":
