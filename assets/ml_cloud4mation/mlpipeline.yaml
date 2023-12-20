@@ -2,7 +2,7 @@ Parameters:
   BranchName: 
     Description: CodeCommit branch name 
     Type: String 
-    Default: master 
+    Default: main 
   RepositoryName: 
     Description: CodeCommit repository name 
     Type: String 

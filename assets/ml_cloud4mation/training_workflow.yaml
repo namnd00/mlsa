@@ -82,7 +82,7 @@ Resources:
 
                           "InstanceCount": 1, 
 
-                          "InstanceType": "ml.g4dn.4xlarge", 
+                          "InstanceType": "ml.g4dn.xlarge", 
 
                           "VolumeSizeInGB": 30 
 

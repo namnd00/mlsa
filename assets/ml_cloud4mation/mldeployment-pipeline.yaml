@@ -6,7 +6,7 @@ Parameters:
 
     Type: String 
 
-    Default: master 
+    Default: main 
 
   RepositoryName: 
 
